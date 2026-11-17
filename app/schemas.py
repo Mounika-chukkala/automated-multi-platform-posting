@@ -36,13 +36,24 @@ class PostingRequest(BaseModel):
         # Validate the URL structure
         parsed_url = urlsplit(urls[0])
 
+        try:
+            hostname = parsed_url.hostname
+            port = parsed_url.port
+        except ValueError:
+            raise ValueError("Please provide a valid HTTP or HTTPS URL.")
+
         if (
             parsed_url.scheme not in ("http", "https")
-            or not parsed_url.hostname
-            or "." not in parsed_url.hostname
+    or not hostname
+    or "." not in hostname
+    or hostname.startswith(".")
+    or hostname.endswith(".")
+    or " " in hostname
         ):
             raise ValueError("Please provide a valid HTTP or HTTPS URL.")
 
+        if port is not None and not (1 <= port <= 65535):
+            raise ValueError("Please provide a valid HTTP or HTTPS URL.")
         return message
 
 

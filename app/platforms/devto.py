@@ -68,13 +68,14 @@ class DevToPlatform(BasePlatform):
             public_access = False
 
             try:
-                verification = await client.get(post_url)
-
-                public_access = (
-                    verification.status_code == 200
+                verification = await client.get(
+                post_url,
+                timeout=10.0
                 )
 
-            except httpx.RequestError:
+                public_access = verification.status_code == 200
+
+            except (httpx.HTTPError, ValueError):
                 public_access = False
 
         now = datetime.now(timezone.utc)

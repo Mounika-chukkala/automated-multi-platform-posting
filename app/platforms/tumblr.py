@@ -4,12 +4,13 @@ import json
 import urllib.error
 import urllib.parse
 import urllib.request
-
+import logging
 from datetime import datetime, timezone
 
 from app.config import settings
 from app.platforms.base import BasePlatform
 
+logger = logging.getLogger(__name__)
 
 class TumblrPlatform(BasePlatform):
 
@@ -95,7 +96,7 @@ class TumblrPlatform(BasePlatform):
         )
 
         except Exception as exc:
-            print(f"Tumblr verification warning: {exc}")
+            logger.exception("Tumblr public-access verification failed")
             return False
 
 

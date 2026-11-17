@@ -15,13 +15,11 @@ class MastodonPlatform(BasePlatform):
 
     async def verify_public_access(self, status_id: str) -> bool:
         instance_url = settings.mastodon_instance_url.rstrip("/")
-
         endpoint = f"{instance_url}/api/v1/statuses/{status_id}"
 
         try:
             async with httpx.AsyncClient(timeout=10.0) as client:
                 response = await client.get(endpoint)
-
                 response.raise_for_status()
 
                 status_data = response.json()
@@ -45,13 +43,10 @@ class MastodonPlatform(BasePlatform):
             )
 
         instance_url = settings.mastodon_instance_url.rstrip("/")
-
         endpoint = f"{instance_url}/api/v1/statuses"
 
         headers = {
-            "Authorization": (
-                f"Bearer {settings.mastodon_access_token}"
-            )
+            "Authorization": f"Bearer {settings.mastodon_access_token}"
         }
 
         payload = {
@@ -60,15 +55,12 @@ class MastodonPlatform(BasePlatform):
         }
 
         async with httpx.AsyncClient(timeout=20.0) as client:
-
             response = await client.post(
                 endpoint,
                 headers=headers,
                 json=payload
             )
-
             response.raise_for_status()
-
             post_data = response.json()
 
         post_url = post_data.get("url")
@@ -76,12 +68,13 @@ class MastodonPlatform(BasePlatform):
 
         if not post_url or not status_id:
             raise RuntimeError(
-        "Mastodon response is missing the post URL or ID."
-    )
+                "Mastodon response is missing the post URL or ID."
+            )
 
         public_access = await self.verify_public_access(status_id)
 
         now = datetime.now(timezone.utc)
+
         return {
             "platform": self.platform_name,
             "status": "success",

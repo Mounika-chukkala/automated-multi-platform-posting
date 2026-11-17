@@ -46,3 +46,15 @@ def test_message_with_exactly_200_characters_is_accepted():
     assert len(message) == 200
     request = PostingRequest(message=message)
     assert len(request.message) == 200
+
+@pytest.mark.parametrize(
+    "url",
+    [
+        "https://example.com:invalid",
+        "https://example.com:99999",
+        "https://.example.com",
+    ],
+)
+def test_malformed_urls_are_rejected(url):
+    with pytest.raises(ValidationError):
+        PostingRequest(message=f"Check this out: {url}")

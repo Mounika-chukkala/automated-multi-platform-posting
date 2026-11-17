@@ -22,17 +22,24 @@ class WordPressPlatform(BasePlatform):
         site = self.get_site_identifier()
 
         url = (
-            f"https://public-api.wordpress.com/rest/v1.1/"
-            f"sites/{site}/posts/{post_id}"
-        )
+        f"https://public-api.wordpress.com/rest/v1.1/"
+        f"sites/{site}/posts/{post_id}"
+    )
 
-        async with httpx.AsyncClient(timeout=20) as client:
-            response = await client.get(url)
-            response.raise_for_status()
+        try:
+            async with httpx.AsyncClient(timeout=20) as client:
+                response = await client.get(url)
+                response.raise_for_status()
 
-        post = response.json()
+                post = response.json()
 
-        return post.get("status") == "publish" and bool(post.get("URL"))
+                return (
+                post.get("status") == "publish"
+                and bool(post.get("URL"))
+            )
+
+        except (httpx.HTTPError, ValueError):
+            return False
 
     async def publish(self, message):
         if not settings.wordpress_access_token:
